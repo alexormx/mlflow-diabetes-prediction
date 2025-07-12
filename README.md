@@ -21,6 +21,8 @@ mlflow-diabetes-prediction/
 ├── README.md                  # Este archivo
 └── .gitignore                 # Archivos ignorados por git
 
+```
+
 ---
 
 ## 📊 Dataset utilizado
@@ -73,6 +75,7 @@ Instala las dependencias usando:
 
 ```bash
 pip install -r requirements.txt
+```
 
 ## 🔁 Reproducibilidad
 
@@ -81,12 +84,14 @@ pip install -r requirements.txt
 ```bash
 git clone https://github.com/alexormx/mlflow-diabetes-prediction.git
 cd mlflow-diabetes-prediction
+```
 
 ### 2. Crea y activa un entorno virtual:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
+```
 
 ---
 
@@ -94,6 +99,7 @@ source .venv/bin/activate
 
 ```bash
 pip install -r requirements.txt
+```
 
 ---
 
