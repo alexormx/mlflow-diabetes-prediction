@@ -1,6 +1,19 @@
+
 # 🩺 Diabetes Prediction with MLflow
 
-Este proyecto aplica técnicas de Machine Learning tradicional para predecir si una persona padece diabetes, utilizando el conocido dataset **Pima Indians Diabetes**. El enfoque incluye análisis exploratorio, preprocesamiento, modelado, evaluación y seguimiento de experimentos con MLflow.
+Este proyecto aplica técnicas de Machine Learning tradicional para predecir si una persona padece diabetes, utilizando el dataset **Pima Indians Diabetes**. Forma parte del portafolio final del curso **AiLab**, siguiendo la metodología de pipelines propuesta por **Pau Labarta** y registrando métricas con **MLflow**.
+
+---
+
+## 🎯 Objetivo
+
+Desarrollar un pipeline de predicción por lotes (batch-prediction service) dividido en tres etapas:
+
+- 📘 Feature pipeline
+- 📙 Training pipeline
+- 📒 Batch inference pipeline
+
+Cada etapa está contenida en un notebook independiente, garantizando modularidad, reproducibilidad y trazabilidad.
 
 ---
 
@@ -9,18 +22,22 @@ Este proyecto aplica técnicas de Machine Learning tradicional para predecir si 
 ```bash
 mlflow-diabetes-prediction/
 │
-├── data/                      # Dataset original (CSV)
-├── models/                    # Modelos entrenados (opcional)
+├── data/                      # Dataset original y features procesados
+│   ├── diabetes.csv
+│   └── features/
+│       ├── X_train.csv
+│       ├── X_test.csv
+│       ├── y_train.csv
+│       └── y_test.csv
+├── models/                    # Modelos entrenados (pickle, etc.)
 ├── notebooks/                 # Jupyter notebooks por etapa
-│   ├── 01_eda.ipynb           # Análisis exploratorio (EDA)
-│   ├── 02_preprocessing.ipynb # Limpieza, imputación, outliers
-│   └── 03_model_training.ipynb# Entrenamiento y evaluación
-│
-├── mlruns/                    # Experimentos registrados por MLflow
-├── requirements.txt           # Librerías necesarias
-├── README.md                  # Este archivo
-└── .gitignore                 # Archivos ignorados por git
-
+│   ├── 01_eda.ipynb
+│   ├── 02_preprocessing.ipynb
+│   ├── 03_training_validation.ipynb
+│   └── 04_evaluation_export.ipynb
+├── requirements.txt
+├── README.md
+└── .gitignore
 ```
 
 ---
@@ -33,90 +50,75 @@ mlflow-diabetes-prediction/
 
 ---
 
-## 🚀 Pipeline del proyecto
+## 🔁 Pipeline del proyecto
 
-### 1. Exploración de Datos (EDA) – `01_eda.ipynb`
+### 📘 1. Exploración de Datos (EDA)
+- Visualización de distribuciones, outliers y valores faltantes
+- Análisis de correlación entre variables
+- Identificación de datos fisiológicamente imposibles
 
-- Visualización y estadísticos generales del dataset.
-- Análisis de la distribución por clase (`Outcome`).
-- Identificación de valores erróneos como ceros fisiológicamente imposibles.
-- Análisis de correlación entre variables.
+### 📘 2. Preprocesamiento
+- Imputación conservadora de valores faltantes (mediana)
+- Capping de outliers extremos por percentiles
+- Transformación logarítmica de variables asimétricas
+- Análisis de importancia de características (`mutual_info_classif`)
+- División en `train/test` y guardado de features para el pipeline de entrenamiento
 
-### 2. Preprocesamiento – `02_preprocessing.ipynb`
+### 📙 3. Entrenamiento y Validación
+- Comparación de modelos con `LazyPredict`
+- Entrenamiento de modelos con mejor desempeño (ej. Random Forest, Logistic Regression)
+- Justificación de métricas seleccionadas: se priorizó F1-score debido a la necesidad de balance entre Precision y Recall
+- Registro de experimentos con **MLflow**
 
-- Imputación de valores faltantes (ceros inválidos → NaN).
-- Tratamiento de outliers.
-- Escalado de variables numéricas.
-- Separación en sets de entrenamiento y prueba.
-
-### 3. Entrenamiento de modelos – `03_model_training.ipynb`
-
-- Modelos evaluados:
-  - Logistic Regression
-  - Random Forest
-  - Support Vector Machine (SVM)
-- Métricas comparadas: Accuracy, Precision, Recall, F1, ROC AUC
-- Uso de MLflow para rastrear experimentos y parámetros
+### 📒 4. Evaluación final y exportación
+- Métricas: Accuracy, Precision, Recall, F1, ROC AUC
+- Exportación del modelo final y métricas clave
 
 ---
 
 ## 🔍 Hallazgos clave
 
-- `Glucose`, `BMI`, `Age` y `Pregnancies` son las variables más correlacionadas con la diabetes.
-- No se detectó multicolinealidad severa entre variables predictoras.
-- Se realizó imputación conservadora de valores faltantes (como ceros en presión sanguínea, insulina, etc.).
-- Random Forest obtuvo la mejor métrica F1 en los experimentos realizados.
+- `Glucose`, `BMI`, `Age` y `Pregnancies` son las variables más informativas según `mutual_info_classif`.
+- El análisis no evidenció multicolinealidad significativa.
+- Random Forest logró el mejor rendimiento general (mayor F1).
+- Se evitaron transformaciones innecesarias como escalado, ya que el modelo elegido no lo requería.
+- El preprocesamiento fue completamente modularizado y versionado.
+
+---
+
+## ⚠️ Notas sobre escalado
+
+El escalado (`StandardScaler`) **no se aplicó** en esta etapa porque el modelo final seleccionado (Random Forest) **no lo requiere**.  
+Además, el análisis de importancia de características con `mutual_info_classif` se realiza **antes del escalado**, ya que esta métrica **es invariante a transformaciones de escala**.
 
 ---
 
 ## 🧪 Requisitos
 
-Instala las dependencias usando:
-
 ```bash
 pip install -r requirements.txt
 ```
 
-## 🔁 Reproducibilidad
+---
 
-### 1. Clona el repositorio:
+## 🔁 Reproducibilidad
 
 ```bash
 git clone https://github.com/alexormx/mlflow-diabetes-prediction.git
 cd mlflow-diabetes-prediction
-```
-
-### 2. Crea y activa un entorno virtual:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
----
-
-### 3. Instala las dependencias:
-
-```bash
+python -m venv .venv
+source .venv/bin/activate  # En Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
 ---
 
-### 4. Ejecuta los notebooks en orden desde Jupyter:
-- 01_eda.ipynb
-- 02_preprocessing.ipynb
-- 03_model_training.ipynb
-
----
-
 ## ✍️ Autor
-Alejandro Ortiz Lopez
-LinkedIn | GitHub
+Alejandro Ortiz Lopez  
+[LinkedIn](https://www.linkedin.com/in/alexormx/) | GitHub: `@alexormx`
 
 ---
 
-##  📌 Licencia
+## 📌 Licencia
+
 Este proyecto se publica con fines educativos. Puedes usar y modificar el contenido respetando la fuente original del dataset (Kaggle).
-
----
