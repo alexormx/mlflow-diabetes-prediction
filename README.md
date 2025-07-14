@@ -1,139 +1,100 @@
-# 🩺 Predicción de Diabetes con MLflow y Random Forest
 
-Este proyecto implementa un flujo completo de Machine Learning tradicional para predecir la probabilidad de diabetes tipo 2 usando el dataset **Pima Indians Diabetes**. Se siguen buenas prácticas de ingeniería de características, comparación de modelos, selección basada en métricas y registro con MLflow. Además, se estructura como servicio de predicción por lotes siguiendo la arquitectura propuesta por Pau Labarta.
+# 🔍 Diabetes Prediction with MLflow & Random Forest
+
+Este proyecto utiliza **machine learning clásico** (Random Forest Classifier) para predecir si un paciente presenta o no diabetes, con seguimiento de experimentos mediante **MLflow** y una arquitectura modular basada en la metodología de **Pau Labarta**.
 
 ---
 
-## 🎯 Objetivo del Proyecto
+## 🎯 Objetivo
 
-Predecir la presencia de diabetes a partir de variables clínicas usando modelos de clasificación tradicionales, optimizando el rendimiento mediante preprocesamiento, selección de características, comparación de modelos y ajuste de hiperparámetros.
+Desarrollar un pipeline completo de clasificación binaria utilizando datos médicos, enfocado en predecir la diabetes con un modelo clásico optimizado y seguimiento de métricas.
 
 ---
 
 ## 📦 Dataset
 
-El dataset contiene 768 registros con las siguientes variables:
-
-- Glucose, BloodPressure, Insulin, BMI, Age, SkinThickness, etc.
-- Variable target: `Outcome` (1 = Diabetes, 0 = No Diabetes)
-
----
-
-## 📊 Flujo del Proyecto
-
-El proyecto sigue el enfoque de **Batch-Prediction Service** propuesto por Pau Labarta:
-
-
-- 📘 Feature pipeline
-- 📙 Training pipeline
-- 📒 Batch inference pipeline
-
-Cada etapa está contenida en un notebook independiente, garantizando modularidad, reproducibilidad y trazabilidad.
+- **Fuente:** Pima Indians Diabetes Database (Kaggle)
+- **Tamaño:** 768 muestras × 9 columnas
+- **Variables:** Glucosa, IMC, Edad, Embarazos, Presión, Insulina, Pedigrí, etc.
+- **Objetivo (Target):** 1 (diabético), 0 (no diabético)
 
 ---
 
-## 📁 Estructura del proyecto
+## 🧭 Estructura del Proyecto
 
-```bash
+```
 mlflow-diabetes-prediction/
-│
-├── data/                      # Dataset original y features procesados
-│   ├── diabetes.csv
-│   └── features/
-│       ├── X_train.csv
-│       ├── X_test.csv
-│       ├── y_train.csv
-│       └── y_test.csv
-├── models/                    # Modelos entrenados (pickle, etc.)
-├── notebooks/                 # Jupyter notebooks por etapa
+├── data/
+│   ├── raw/                  ← Dataset original
+│   ├── features/             ← X_train, y_train, X_test, y_test
+├── notebooks/
 │   ├── 01_eda.ipynb
 │   ├── 02_preprocessing.ipynb
 │   ├── 03_training_validation.ipynb
-│   └── 04_evaluation_export.ipynb
-├── requirements.txt
+│   ├── 04_evaluation_export.ipynb
+├── models/                   ← Registro de modelos (MLflow)
 ├── README.md
-└── .gitignore
+└── requirements.txt
 ```
 
 ---
 
-## 📊 Dataset utilizado
+## 🔁 Flujo del Proyecto (Pau Labarta)
 
-- **Fuente**: [Kaggle - Pima Indians Diabetes Database](https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database)
-- **Registros**: 768 mujeres mayores de 21 años
-- **Variables**: 8 predictoras + 1 objetivo (`Outcome`: 1 = tiene diabetes, 0 = no)
+1. **EDA & Preprocesamiento**  
+   - Revisión de nulos y valores atípicos  
+   - Imputación con mediana  
+   - `Capping` de outliers severos  
+   - `log-transform` para variables asimétricas  
+   - `StandardScaler` aplicado  
+   - Selección de características vía `mutual_info_classif`
 
----
+2. **Entrenamiento y Validación**
+   - Evaluación de +20 modelos con `LazyPredict`  
+   - Selección de **Random Forest** por su balance entre desempeño y tiempo
+   - Aplicación de **SMOTE** para balanceo de clases
+   - Ajuste de hiperparámetros (`max_depth`, `n_estimators`, `class_weight`, etc.)
+   - Registro en **MLflow** con métricas y artefactos
 
-## 🔁 Pipeline del proyecto
-
-### 📘 1. Exploración de Datos (EDA)
-- Visualización de distribuciones, outliers y valores faltantes
-- Análisis de correlación entre variables
-- Identificación de datos fisiológicamente imposibles
-
-### 📘 2. Preprocesamiento
-- Imputación conservadora de valores faltantes (mediana)
-- Capping de outliers extremos por percentiles
-- Transformación logarítmica de variables asimétricas
-- Análisis de importancia de características (`mutual_info_classif`)
-- División en `train/test` y guardado de features para el pipeline de entrenamiento
-
-### 📙 3. Entrenamiento y Validación
-- Comparación de modelos con `LazyPredict`
-- Entrenamiento de modelos con mejor desempeño (ej. Random Forest, Logistic Regression)
-- Justificación de métricas seleccionadas: se priorizó F1-score debido a la necesidad de balance entre Precision y Recall
-- Registro de experimentos con **MLflow**
-
-### 📒 4. Evaluación final y exportación
-- Métricas: Accuracy, Precision, Recall, F1, ROC AUC
-- Exportación del modelo final y métricas clave
+3. **Evaluación Final**
+   - Matriz de confusión, curva ROC, y métricas de desempeño
+   - Exportación del modelo
 
 ---
 
-## 🔍 Hallazgos clave
+## 📊 Métricas Finales (Random Forest optimizado)
 
-- `Glucose`, `BMI`, `Age` y `Pregnancies` son las variables más informativas según `mutual_info_classif`.
-- El análisis no evidenció multicolinealidad significativa.
-- Random Forest logró el mejor rendimiento general (mayor F1).
-- Se evitaron transformaciones innecesarias como escalado, ya que el modelo elegido no lo requería.
-- El preprocesamiento fue completamente modularizado y versionado.
+| Métrica     | Valor     |
+|-------------|-----------|
+| Accuracy    | 0.7208    |
+| Precision   | 0.6491    |
+| Recall      | 0.6852    |
+| F1-score    | 0.6504    |
+| ROC AUC     | 0.7254    |
 
----
-
-## ⚠️ Notas sobre escalado
-
-El escalado (`StandardScaler`) **no se aplicó** en esta etapa porque el modelo final seleccionado (Random Forest) **no lo requiere**.  
-Además, el análisis de importancia de características con `mutual_info_classif` se realiza **antes del escalado**, ya que esta métrica **es invariante a transformaciones de escala**.
+✅ **SMOTE** ayudó a mejorar el recall para reducir falsos negativos (diagnósticos omitidos).
 
 ---
 
-## 🧪 Requisitos
+## 💡 Recomendaciones Futuras
 
-```bash
-pip install -r requirements.txt
+- 🔄 Ajuste adicional con `Optuna` o `GridSearchCV` más extenso.
+- ⚖️ Probar `class_weight='balanced_subsample'` o ensembles híbridos.
+- 📈 Validación cruzada con `StratifiedKFold`.
+- 🧪 Comparativa con modelos como `XGBoost`, `LightGBM`.
+- 🚀 Publicar como API con FastAPI o desplegar vía Streamlit.
+
+---
+
+## 🧪 Ejecución
+
+```
+# Entrenar desde notebook principal
+jupyter notebook notebooks/03_training_validation.ipynb
 ```
 
 ---
 
-## 🔁 Reproducibilidad
+## 📝 Créditos
 
-```bash
-git clone https://github.com/alexormx/mlflow-diabetes-prediction.git
-cd mlflow-diabetes-prediction
-python -m venv .venv
-source .venv/bin/activate  # En Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
-
----
-
-## ✍️ Autor
-Alejandro Ortiz Lopez  
-[LinkedIn](https://www.linkedin.com/in/alexormx/) | GitHub: `@alexormx`
-
----
-
-## 📌 Licencia
-
-Este proyecto se publica con fines educativos. Puedes usar y modificar el contenido respetando la fuente original del dataset (Kaggle).
+Desarrollado por [@alexormx](https://github.com/alexormx) como parte del portafolio final de **AiLab** – Proyecto de clasificación binaria.
