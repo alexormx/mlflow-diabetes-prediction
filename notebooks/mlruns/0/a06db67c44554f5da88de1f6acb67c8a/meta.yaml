@@ -1,0 +1,15 @@
+artifact_uri: file:///home/alexor/ailab/diabetes_prediction/notebooks/mlruns/0/a06db67c44554f5da88de1f6acb67c8a/artifacts
+end_time: 1752422077125
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: a06db67c44554f5da88de1f6acb67c8a
+run_name: RandomForestClassifier
+run_uuid: a06db67c44554f5da88de1f6acb67c8a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752422074100
+status: 3
+tags: []
+user_id: alexor

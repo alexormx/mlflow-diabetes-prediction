@@ -1,0 +1,15 @@
+artifact_uri: file:///home/alexor/ailab/diabetes_prediction/notebooks/mlruns/0/7a2dd7786c854c82ae4be3d391cb6f73/artifacts
+end_time: 1752428263242
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 7a2dd7786c854c82ae4be3d391cb6f73
+run_name: intrigued-duck-982
+run_uuid: 7a2dd7786c854c82ae4be3d391cb6f73
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752428212325
+status: 3
+tags: []
+user_id: alexor
