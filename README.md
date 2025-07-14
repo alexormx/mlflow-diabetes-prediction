@@ -1,13 +1,28 @@
+# 🩺 Predicción de Diabetes con MLflow y Random Forest
 
-# 🩺 Diabetes Prediction with MLflow
-
-Este proyecto aplica técnicas de Machine Learning tradicional para predecir si una persona padece diabetes, utilizando el dataset **Pima Indians Diabetes**. Forma parte del portafolio final del curso **AiLab**, siguiendo la metodología de pipelines propuesta por **Pau Labarta** y registrando métricas con **MLflow**.
+Este proyecto implementa un flujo completo de Machine Learning tradicional para predecir la probabilidad de diabetes tipo 2 usando el dataset **Pima Indians Diabetes**. Se siguen buenas prácticas de ingeniería de características, comparación de modelos, selección basada en métricas y registro con MLflow. Además, se estructura como servicio de predicción por lotes siguiendo la arquitectura propuesta por Pau Labarta.
 
 ---
 
-## 🎯 Objetivo
+## 🎯 Objetivo del Proyecto
 
-Desarrollar un pipeline de predicción por lotes (batch-prediction service) dividido en tres etapas:
+Predecir la presencia de diabetes a partir de variables clínicas usando modelos de clasificación tradicionales, optimizando el rendimiento mediante preprocesamiento, selección de características, comparación de modelos y ajuste de hiperparámetros.
+
+---
+
+## 📦 Dataset
+
+El dataset contiene 768 registros con las siguientes variables:
+
+- Glucose, BloodPressure, Insulin, BMI, Age, SkinThickness, etc.
+- Variable target: `Outcome` (1 = Diabetes, 0 = No Diabetes)
+
+---
+
+## 📊 Flujo del Proyecto
+
+El proyecto sigue el enfoque de **Batch-Prediction Service** propuesto por Pau Labarta:
+
 
 - 📘 Feature pipeline
 - 📙 Training pipeline
